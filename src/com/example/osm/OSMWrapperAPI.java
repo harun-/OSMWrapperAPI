@@ -16,7 +16,6 @@ package com.example.osm;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  */
-package org.osm.lights.extraction.osm;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -38,8 +37,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.osm.lights.diff.OSMNode;
-import org.osm.lights.upload.BasicAuthenticator;
+//import org.osm.lights.diff.OSMNode;
+//import org.osm.lights.upload.BasicAuthenticator;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -220,18 +219,4 @@ public class OSMWrapperAPI {
 		}
 	}
 	
-}
-
-public class OSMNode {
-	
-	private String id;
-	
-	private String lat;
-	
-	private String lon;
-	
-	private final Map<String, String> tags;
-
-	private String version;
-
 }
