@@ -213,9 +213,9 @@ public class OSMWrapperAPI {
 	 */
 	public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException {
 		Authenticator.setDefault(new BasicAuthenticator("youruser", "yourpassword"));
-		List<OSMNode> osmNodesInVicinity = getOSMNodesInVicinity(49, 8.3, 0.005);
+		List<OSMNode> osmNodesInVicinity = getOSMNodesInVicinity(49.011888, 8.4149201, 0.005);
 		for (OSMNode osmNode : osmNodesInVicinity) {
-			System.out.println(osmNode.getId() + ":" + osmNode.getLat() + ":" + osmNode.getLon());
+			System.out.println(osmNode.getId() + ":" + osmNode.getLon() + "," + osmNode.getLat());
 		}
 	}
 	
