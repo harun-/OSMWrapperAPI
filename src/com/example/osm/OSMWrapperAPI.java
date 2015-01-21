@@ -95,7 +95,10 @@ public class OSMWrapperAPI {
 
 		DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
-		return docBuilder.parse(connection.getInputStream());
+		Document tempDoc = docBuilder.parse(connection.getInputStream());
+		
+		System.out.print(tempDoc.toString());
+		return tempDoc;
 	}
 
 	public static Document getXMLFile(String location) throws ParserConfigurationException, SAXException, IOException {
@@ -180,8 +183,10 @@ public class OSMWrapperAPI {
 
 		DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
-		return docBuilder.parse(connection.getInputStream());
+		return (testDoc = docBuilder.parse(connection.getInputStream()));
 	}
+	
+	public static Document testDoc;
 
 	/**
 	 * 
@@ -217,6 +222,7 @@ public class OSMWrapperAPI {
 		for (OSMNode osmNode : osmNodesInVicinity) {
 			System.out.println(osmNode.getId() + ":" + osmNode.getLon() + "," + osmNode.getLat());
 		}
+		System.out.println(testDoc.getInputEncoding());
 	}
 	
 }
