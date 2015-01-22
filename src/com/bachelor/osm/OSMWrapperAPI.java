@@ -1,4 +1,4 @@
-package com.example.osm;
+package com.bachelor.osm;
 
 /**
  * (c) Jens Kübler
@@ -36,6 +36,9 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 
 //import org.osm.lights.diff.OSMNode;
 //import org.osm.lights.upload.BasicAuthenticator;
@@ -222,7 +225,18 @@ public class OSMWrapperAPI {
 		for (OSMNode osmNode : osmNodesInVicinity) {
 			System.out.println(osmNode.getId() + ":" + osmNode.getLon() + "," + osmNode.getLat());
 		}
-		System.out.println(testDoc.getInputEncoding());
+		try {
+			System.out.println(DocumentMethods.xmlDocToString(testDoc));
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TransformerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TransformerFactoryConfigurationError e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 }

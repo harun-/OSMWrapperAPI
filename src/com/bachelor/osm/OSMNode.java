@@ -1,4 +1,4 @@
-package com.example.osm;
+package com.bachelor.osm;
 
 import java.util.Map;
 
