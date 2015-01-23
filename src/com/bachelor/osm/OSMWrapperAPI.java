@@ -229,12 +229,15 @@ public class OSMWrapperAPI {
 			System.out.println(DocumentMethods.xmlDocToString(testDoc));
 		} catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
+			System.out.println(1);
 			e.printStackTrace();
 		} catch (TransformerException e) {
 			// TODO Auto-generated catch block
+			System.out.println(2);
 			e.printStackTrace();
 		} catch (TransformerFactoryConfigurationError e) {
 			// TODO Auto-generated catch block
+			System.out.println(3);
 			e.printStackTrace();
 		}
 	}
