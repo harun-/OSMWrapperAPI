@@ -156,8 +156,8 @@ public class OSMWrapperAPI {
 		return osmNodes;
 	}
 
-	public static List<OSMNode> getOSMNodesInVicinity(double lat, double lon, double vicinityRange) throws IOException,
-			SAXException, ParserConfigurationException {
+	public static List<OSMNode> getOSMNodesInVicinity(double lon, double lat, double vicinityRange) throws IOException,
+			SAXException, ParserConfigurationException { // lon and lat were swapped
 		return OSMWrapperAPI.getNodes(getXML(lon, lat, vicinityRange));
 	}
 
@@ -221,7 +221,7 @@ public class OSMWrapperAPI {
 	 */
 	public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException {
 		Authenticator.setDefault(new BasicAuthenticator("youruser", "yourpassword"));
-		List<OSMNode> osmNodesInVicinity = getOSMNodesInVicinity(49.011888, 8.4149201, 0.005);
+		List<OSMNode> osmNodesInVicinity = getOSMNodesInVicinity(49.011888, 8.4149201, 0.0005);
 		for (OSMNode osmNode : osmNodesInVicinity) {
 			System.out.println(osmNode.getId() + ":" + osmNode.getLon() + "," + osmNode.getLat());
 		}
