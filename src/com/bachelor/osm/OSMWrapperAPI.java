@@ -156,9 +156,9 @@ public class OSMWrapperAPI {
 		return osmNodes;
 	}
 
-	public static List<OSMNode> getOSMNodesInVicinity(double lon, double lat, double vicinityRange) throws IOException,
+	public static List<OSMNode> getOSMNodesInVicinity(double lat, double lon, double vicinityRange) throws IOException,
 			SAXException, ParserConfigurationException { // lon and lat were swapped
-		return OSMWrapperAPI.getNodes(getXML(lon, lat, vicinityRange));
+		return OSMWrapperAPI.getNodes(getXML(lat, lon, vicinityRange));
 	}
 
 	/**
