@@ -223,7 +223,8 @@ public class OSMWrapperAPI {
 		Authenticator.setDefault(new BasicAuthenticator("youruser", "yourpassword"));
 		List<OSMNode> osmNodesInVicinity = getOSMNodesInVicinity(49.011888, 8.4149201, 0.0005);
 		for (OSMNode osmNode : osmNodesInVicinity) {
-			System.out.println(osmNode.getId() + ":" + osmNode.getLon() + "," + osmNode.getLat());
+//			System.out.println(osmNode.getId() + ":" + osmNode.getLon() + "," + osmNode.getLat());
+			System.out.println(osmNode.toString());
 		}
 		try {
 			System.out.println(DocumentMethods.xmlDocToString(testDoc));
