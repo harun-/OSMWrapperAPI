@@ -100,7 +100,7 @@ public class OSMWrapperAPI {
 		DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
 		Document tempDoc = docBuilder.parse(connection.getInputStream());
 		
-		System.out.print(tempDoc.toString());
+//		System.out.print(tempDoc.toString());
 		return tempDoc;
 	}
 
@@ -108,6 +108,57 @@ public class OSMWrapperAPI {
 		DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
 		return docBuilder.parse(location);
+	}
+	
+	/**
+	 * 
+	 * @param xmlDocument 
+	 * @return a list of openseamap nodes extracted from xml
+	 */
+	@SuppressWarnings("nls")
+	public static List<OSMWay> getMultipolygons(Document xmlDocument) {
+		List<OSMWay> osmWays = new ArrayList<OSMWay>();
+
+		// Document xml = getXML(8.32, 49.001);
+		Node osmRoot = xmlDocument.getFirstChild();
+		NodeList osmXMLNodes = osmRoot.getChildNodes();
+		for (int i = 1; i < osmXMLNodes.getLength(); i++) {
+			Node item = osmXMLNodes.item(i);
+			if (item.getNodeName().equals("way")) {
+				NamedNodeMap attributes = item.getAttributes(); // Attribute rechts von way
+				NodeList ndOrTagXMLNodes = item.getChildNodes();
+				
+				ArrayList<String> refNodesIDs = new ArrayList<String>();
+				Map<String, String> tags = new HashMap<String, String>();
+				
+				for (int j = 1; j < ndOrTagXMLNodes.getLength(); j++) {
+					Node ndOrTagItem = ndOrTagXMLNodes.item(j);
+					
+					NamedNodeMap ndOrTagAttributes = ndOrTagItem.getAttributes();
+					if (ndOrTagAttributes != null) {
+						if (ndOrTagItem.getNodeName().equals("tag")) {
+							tags.put(ndOrTagAttributes.getNamedItem("k").getNodeValue(), ndOrTagAttributes.getNamedItem("v")
+								.getNodeValue());
+						} else if (ndOrTagItem.getNodeName().equals("nd")) {
+							refNodesIDs.add(ndOrTagAttributes.getNamedItem("ref").getNodeValue());
+						}
+						
+					}
+				}
+				Node namedItemID = attributes.getNamedItem("id");
+				Node namedItemVersion = attributes.getNamedItem("version");
+
+				String id = namedItemID.getNodeValue();
+				String version = "0";
+				if (namedItemVersion != null) {
+					version = namedItemVersion.getNodeValue();
+				}
+
+				osmWays.add(new OSMWay(id, refNodesIDs, tags, version));
+			}
+
+		}
+		return osmWays;
 	}
 
 	/**
@@ -221,26 +272,30 @@ public class OSMWrapperAPI {
 	 */
 	public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException {
 		Authenticator.setDefault(new BasicAuthenticator("youruser", "yourpassword"));
-		List<OSMNode> osmNodesInVicinity = getOSMNodesInVicinity(49.011888, 8.4149201, 0.0005);
-		for (OSMNode osmNode : osmNodesInVicinity) {
-//			System.out.println(osmNode.getId() + ":" + osmNode.getLon() + "," + osmNode.getLat());
-			System.out.println(osmNode.toString());
+//		List<OSMNode> osmNodesInVicinity = getOSMNodesInVicinity(49.011888, 8.4149201, 0.0001);
+//		for (OSMNode osmNode : osmNodesInVicinity) {
+//			System.out.println(osmNode.toString());
+//		}
+//		
+		List<OSMWay> osmWaysInVicinity = OSMWrapperAPI.getMultipolygons(getXML(49.011888, 8.4149201, 0.0001));
+		for (OSMWay osmWay : osmWaysInVicinity) {
+			System.out.println(osmWay.toString());
 		}
-		try {
-			System.out.println(DocumentMethods.xmlDocToString(testDoc));
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			System.out.println(1);
-			e.printStackTrace();
-		} catch (TransformerException e) {
-			// TODO Auto-generated catch block
-			System.out.println(2);
-			e.printStackTrace();
-		} catch (TransformerFactoryConfigurationError e) {
-			// TODO Auto-generated catch block
-			System.out.println(3);
-			e.printStackTrace();
-		}
+//		try {
+//			System.out.println(DocumentMethods.xmlDocToString(testDoc));
+//		} catch (IllegalArgumentException e) {
+//			// TODO Auto-generated catch block
+//			System.out.println(1);
+//			e.printStackTrace();
+//		} catch (TransformerException e) {
+//			// TODO Auto-generated catch block
+//			System.out.println(2);
+//			e.printStackTrace();
+//		} catch (TransformerFactoryConfigurationError e) {
+//			// TODO Auto-generated catch block
+//			System.out.println(3);
+//			e.printStackTrace();
+//		}
 	}
 	
 }
