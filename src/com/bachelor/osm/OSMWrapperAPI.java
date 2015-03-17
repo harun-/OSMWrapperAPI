@@ -261,6 +261,18 @@ public class OSMWrapperAPI {
 		reader.close();
 		return fileData.toString();
 	}
+	
+	private static void printNodesHeading() {
+		System.out.println("----------------------");
+		System.out.println("---------Nodes--------");
+		System.out.println("----------------------");
+	}
+	
+	private static void printWaysHeading() {
+		System.out.println("----------------------");
+		System.out.println("---------Ways---------");
+		System.out.println("----------------------");
+	}
 
 	/**
 	 * main method that simply reads some nodes
@@ -272,15 +284,22 @@ public class OSMWrapperAPI {
 	 */
 	public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException {
 		Authenticator.setDefault(new BasicAuthenticator("youruser", "yourpassword"));
-//		List<OSMNode> osmNodesInVicinity = getOSMNodesInVicinity(49.011888, 8.4149201, 0.0001);
-//		for (OSMNode osmNode : osmNodesInVicinity) {
-//			System.out.println(osmNode.toString());
-//		}
-//		
+		
+		printWaysHeading();
+		
 		List<OSMWay> osmWaysInVicinity = OSMWrapperAPI.getMultipolygons(getXML(49.011888, 8.4149201, 0.0001));
 		for (OSMWay osmWay : osmWaysInVicinity) {
 			System.out.println(osmWay.toString());
 		}
+		
+		printNodesHeading();
+		
+		List<OSMNode> osmNodesInVicinity = getOSMNodesInVicinity(49.011888, 8.4149201, 0.0001);
+		for (OSMNode osmNode : osmNodesInVicinity) {
+			System.out.println(osmNode.toString());
+		}
+		
+		
 //		try {
 //			System.out.println(DocumentMethods.xmlDocToString(testDoc));
 //		} catch (IllegalArgumentException e) {
