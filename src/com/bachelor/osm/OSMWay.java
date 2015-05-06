@@ -9,6 +9,8 @@ public class OSMWay {
 	
 	private final ArrayList<String> refNodesIDs;
 	
+	private ArrayList<OSMNode> refNodes;
+	
 	private final Map<String, String> tags;
 	
 	private final String version;
@@ -42,6 +44,11 @@ public class OSMWay {
 		return "OSMWay [id=" + id + ", refNodesIDs=" + refNodesIDs + ", tags="
 				+ tags + ", version=" + version + "]";
 	}
+	
+//	public String toStringWith Coord() {
+//		return "OSMWay [id=" + id + ", refNodesIDs=" + refNodesIDs + ", tags="
+//				+ tags + ", version=" + version + "]";
+//	}
 	
 	
 }

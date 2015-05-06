@@ -61,9 +61,14 @@ public class OSMNode {
 
 	@Override
 	public String toString() {
-		return "OSMNode [id=" + id + ", lat=" + lat + ", lon=" + lon
+//		return "OSMNode [id=" + id + ", lat=" + lat + ", lon=" + lon
+//				+ ", tags=" + tags + ", version=" + version + "]";
+		return "OSMNode [id=" + id + ", (" + lat + ", " + lon + ")"
 				+ ", tags=" + tags + ", version=" + version + "]";
 	}
 	
+	public String getCoord() {
+		return "(" + lat + ", " + lon + ")";
+	}
 	
 }

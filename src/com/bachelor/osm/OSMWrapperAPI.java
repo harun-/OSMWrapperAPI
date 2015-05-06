@@ -36,9 +36,9 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
+
 
 //import org.osm.lights.diff.OSMNode;
 //import org.osm.lights.upload.BasicAuthenticator;
@@ -73,8 +73,8 @@ public class OSMWrapperAPI {
 
 	/**
 	 * 
-	 * @param lon the longitude
 	 * @param lat the latitude
+	 * @param lon the longitude
 	 * @param vicinityRange bounding box in this range
 	 * @return the xml document containing the queries nodes
 	 * @throws IOException
@@ -82,14 +82,14 @@ public class OSMWrapperAPI {
 	 * @throws ParserConfigurationException
 	 */
 	@SuppressWarnings("nls")
-	private static Document getXML(double lon, double lat, double vicinityRange) throws IOException, SAXException,
+	private static Document getXML(double lat, double lon, double vicinityRange) throws IOException, SAXException,
 			ParserConfigurationException {
 
 		DecimalFormat format = new DecimalFormat("##0.0000000", DecimalFormatSymbols.getInstance(Locale.ENGLISH)); //$NON-NLS-1$
-		String left = format.format(lat - vicinityRange);
-		String bottom = format.format(lon - vicinityRange);
-		String right = format.format(lat + vicinityRange);
-		String top = format.format(lon + vicinityRange);
+		String left = format.format(lon - vicinityRange);
+		String bottom = format.format(lat - vicinityRange);
+		String right = format.format(lon + vicinityRange);
+		String top = format.format(lat + vicinityRange);
 
 		String string = OPENSTREETMAP_API_06 + "map?bbox=" + left + "," + bottom + "," + right + ","
 				+ top;
@@ -113,25 +113,35 @@ public class OSMWrapperAPI {
 	/**
 	 * 
 	 * @param xmlDocument 
-	 * @return a list of openseamap nodes extracted from xml
+	 * @return a list of ways, representing a building or a part of a building
 	 */
 	@SuppressWarnings("nls")
 	public static List<OSMWay> getMultipolygons(Document xmlDocument) {
+		
+		// Erstelle leere Liste von OSMWays
 		List<OSMWay> osmWays = new ArrayList<OSMWay>();
 
 		// Document xml = getXML(8.32, 49.001);
 		Node osmRoot = xmlDocument.getFirstChild();
+		// Zugriff auf alle Nodes mit einem "Tab" oder einer "Einrückung"
 		NodeList osmXMLNodes = osmRoot.getChildNodes();
+		
+		// Checke, ob jedes Element ...
 		for (int i = 1; i < osmXMLNodes.getLength(); i++) {
+			
 			Node item = osmXMLNodes.item(i);
+			// ... eine Way ist
 			if (item.getNodeName().equals("way")) {
-				NamedNodeMap attributes = item.getAttributes(); // Attribute rechts von way
+				
+				boolean hasBuildingTag = false;
+				
 				NodeList ndOrTagXMLNodes = item.getChildNodes();
 				
 				ArrayList<String> refNodesIDs = new ArrayList<String>();
 				Map<String, String> tags = new HashMap<String, String>();
 				
 				for (int j = 1; j < ndOrTagXMLNodes.getLength(); j++) {
+					
 					Node ndOrTagItem = ndOrTagXMLNodes.item(j);
 					
 					NamedNodeMap ndOrTagAttributes = ndOrTagItem.getAttributes();
@@ -139,12 +149,20 @@ public class OSMWrapperAPI {
 						if (ndOrTagItem.getNodeName().equals("tag")) {
 							tags.put(ndOrTagAttributes.getNamedItem("k").getNodeValue(), ndOrTagAttributes.getNamedItem("v")
 								.getNodeValue());
+							
+							// Checke, ob es sich um eine Way handelt, die was mit buildings zu tun hat.
+							if (ndOrTagAttributes.getNamedItem("k").getNodeValue().startsWith("building")) {
+								hasBuildingTag = true;
+							}
+							
 						} else if (ndOrTagItem.getNodeName().equals("nd")) {
 							refNodesIDs.add(ndOrTagAttributes.getNamedItem("ref").getNodeValue());
 						}
 						
 					}
 				}
+				
+				NamedNodeMap attributes = item.getAttributes(); // Attribute rechts von way
 				Node namedItemID = attributes.getNamedItem("id");
 				Node namedItemVersion = attributes.getNamedItem("version");
 
@@ -154,7 +172,9 @@ public class OSMWrapperAPI {
 					version = namedItemVersion.getNodeValue();
 				}
 
-				osmWays.add(new OSMWay(id, refNodesIDs, tags, version));
+				if (hasBuildingTag) {
+					osmWays.add(new OSMWay(id, refNodesIDs, tags, version));
+				}
 			}
 
 		}
@@ -168,15 +188,23 @@ public class OSMWrapperAPI {
 	 */
 	@SuppressWarnings("nls")
 	public static List<OSMNode> getNodes(Document xmlDocument) {
+		
+		// Erstelle leere Liste von OSMNodes
 		List<OSMNode> osmNodes = new ArrayList<OSMNode>();
 
 		// Document xml = getXML(8.32, 49.001);
 		Node osmRoot = xmlDocument.getFirstChild();
+		// Zugriff auf alle Nodes mit einem "Tab" oder einer "Einrückung"
 		NodeList osmXMLNodes = osmRoot.getChildNodes();
+		
+		// Checke, ob jedes Element ...
 		for (int i = 1; i < osmXMLNodes.getLength(); i++) {
+			
 			Node item = osmXMLNodes.item(i);
+			// ... eine Node ist
 			if (item.getNodeName().equals("node")) {
-				NamedNodeMap attributes = item.getAttributes();
+				
+				// Tags speichern == Inhalt der ChildNodes speichern
 				NodeList tagXMLNodes = item.getChildNodes();
 				Map<String, String> tags = new HashMap<String, String>();
 				for (int j = 1; j < tagXMLNodes.getLength(); j++) {
@@ -187,11 +215,15 @@ public class OSMWrapperAPI {
 								.getNodeValue());
 					}
 				}
+				
+				NamedNodeMap attributes = item.getAttributes();
+				// Wichtige Attribute speichern
 				Node namedItemID = attributes.getNamedItem("id");
 				Node namedItemLat = attributes.getNamedItem("lat");
 				Node namedItemLon = attributes.getNamedItem("lon");
 				Node namedItemVersion = attributes.getNamedItem("version");
 
+				// Vorbereitung, um eine OSMNode mit den benötigten Informationen zu erstellen
 				String id = namedItemID.getNodeValue();
 				String latitude = namedItemLat.getNodeValue();
 				String longitude = namedItemLon.getNodeValue();
@@ -199,8 +231,10 @@ public class OSMWrapperAPI {
 				if (namedItemVersion != null) {
 					version = namedItemVersion.getNodeValue();
 				}
-
+				
+				// Erstelle eine OSMNode
 				osmNodes.add(new OSMNode(id, latitude, longitude, version, tags));
+				
 			}
 
 		}
@@ -273,6 +307,30 @@ public class OSMWrapperAPI {
 		System.out.println("---------Ways---------");
 		System.out.println("----------------------");
 	}
+	
+	private static List<OSMWay> osmNodesInVicinity;
+	
+	private static void printNodes(double lat, double lon, double radius)
+			throws IOException, SAXException, ParserConfigurationException {
+		printNodesHeading();
+		
+		List<OSMNode> osmNodesInVicinity = getOSMNodesInVicinity(lat, lon, radius);
+		for (OSMNode osmNode : osmNodesInVicinity) {
+			System.out.println(osmNode.toString());
+		}
+	}
+	
+	private static List<OSMWay> osmWaysInVicinity;
+
+	private static void printWays(double lat, double lon, double radius)
+			throws IOException, SAXException, ParserConfigurationException {
+		printWaysHeading();
+		
+		osmWaysInVicinity = OSMWrapperAPI.getMultipolygons(getXML(lat, lon, radius));
+		for (OSMWay osmWay : osmWaysInVicinity) {
+			System.out.println(osmWay.toString());
+		}
+	}
 
 	/**
 	 * main method that simply reads some nodes
@@ -283,38 +341,36 @@ public class OSMWrapperAPI {
 	 * @throws ParserConfigurationException
 	 */
 	public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException {
+		
+		//49.01105,8.4147
+		// Gebäude links vom Architekturgebäude: 49.0118, 8.41
+		// id des Gebäude-Multipolygons: 23711721
+		// linker Punkt des Gebäudes: 256759672
+		double lat = 49.0118;
+		double lon = 8.41;
+		double radius = 0.0007;
+		
 		Authenticator.setDefault(new BasicAuthenticator("youruser", "yourpassword"));
 		
-		printWaysHeading();
+		printWays(lat, lon, radius);
 		
-		List<OSMWay> osmWaysInVicinity = OSMWrapperAPI.getMultipolygons(getXML(49.011888, 8.4149201, 0.0001));
-		for (OSMWay osmWay : osmWaysInVicinity) {
-			System.out.println(osmWay.toString());
+		printNodes(lat, lon, radius);
+		
+		// Alle Referenzen herstellen in den Ways zu den Nodes
+		for (OSMWay way: osmWaysInVicinity) {
+			
+			ArrayList<OSMNode> refNodes = new ArrayList<OSMNode>();
+			
+			for (String nodeIDString: way.getRefNodesIDs()) {
+				
+				OSMNode tempNode;
+				tempNode = osmNodesInVicinity.ge
+				
+				refNodes.add(tempNode);
+			}
 		}
-		
-		printNodesHeading();
-		
-		List<OSMNode> osmNodesInVicinity = getOSMNodesInVicinity(49.011888, 8.4149201, 0.0001);
-		for (OSMNode osmNode : osmNodesInVicinity) {
-			System.out.println(osmNode.toString());
-		}
-		
-		
-//		try {
-//			System.out.println(DocumentMethods.xmlDocToString(testDoc));
-//		} catch (IllegalArgumentException e) {
-//			// TODO Auto-generated catch block
-//			System.out.println(1);
-//			e.printStackTrace();
-//		} catch (TransformerException e) {
-//			// TODO Auto-generated catch block
-//			System.out.println(2);
-//			e.printStackTrace();
-//		} catch (TransformerFactoryConfigurationError e) {
-//			// TODO Auto-generated catch block
-//			System.out.println(3);
-//			e.printStackTrace();
-//		}
+
+
 	}
 	
 }
