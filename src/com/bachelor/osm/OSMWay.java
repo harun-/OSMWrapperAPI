@@ -1,6 +1,7 @@
 package com.bachelor.osm;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class OSMWay {
@@ -9,7 +10,7 @@ public class OSMWay {
 	
 	private final ArrayList<String> refNodesIDs;
 	
-	private ArrayList<OSMNode> refNodes;
+	private LinkedHashMap<String, OSMNode> refNodes;
 	
 	private final Map<String, String> tags;
 	
@@ -43,6 +44,14 @@ public class OSMWay {
 	public String toString() {
 		return "OSMWay [id=" + id + ", refNodesIDs=" + refNodesIDs + ", tags="
 				+ tags + ", version=" + version + "]";
+	}
+
+	public LinkedHashMap<String, OSMNode> getRefNodes() {
+		return refNodes;
+	}
+
+	public void setRefNodes(LinkedHashMap<String, OSMNode> refNodes) {
+		this.refNodes = refNodes;
 	}
 	
 //	public String toStringWith Coord() {

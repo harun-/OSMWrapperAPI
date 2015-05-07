@@ -1,7 +1,7 @@
 package com.bachelor.osm;
 
 /**
- * (c) Jens Kübler
+ * (c) Jens Kï¿½bler
  * This software is public domain
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -29,16 +29,13 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-
 
 //import org.osm.lights.diff.OSMNode;
 //import org.osm.lights.upload.BasicAuthenticator;
@@ -56,20 +53,20 @@ public class OSMWrapperAPI {
 	private static final String OVERPASS_API = "http://www.overpass-api.de/api/interpreter";
 	private static final String OPENSTREETMAP_API_06 = "http://www.openstreetmap.org/api/0.6/";
 
-	public static OSMNode getNode(String nodeId) throws IOException, ParserConfigurationException, SAXException {
-		String string = "http://www.openstreetmap.org/api/0.6/node/" + nodeId;
-		URL osm = new URL(string);
-		HttpURLConnection connection = (HttpURLConnection) osm.openConnection();
-
-		DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
-		DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
-		Document document = docBuilder.parse(connection.getInputStream());
-		List<OSMNode> nodes = getNodes(document);
-		if (!nodes.isEmpty()) {
-			return nodes.iterator().next();
-		}
-		return null;
-	}
+//	public static OSMNode getNode(String nodeId) throws IOException, ParserConfigurationException, SAXException {
+//		String string = "http://www.openstreetmap.org/api/0.6/node/" + nodeId;
+//		URL osm = new URL(string);
+//		HttpURLConnection connection = (HttpURLConnection) osm.openConnection();
+//
+//		DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+//		DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
+//		Document document = docBuilder.parse(connection.getInputStream());
+//		HashMap<String, OSMNode> nodes = getNodes(document);
+//		if (!nodes.isEmpty()) {
+//			return nodes.iterator().next();
+//		}
+//		return null;
+//	}
 
 	/**
 	 * 
@@ -116,14 +113,14 @@ public class OSMWrapperAPI {
 	 * @return a list of ways, representing a building or a part of a building
 	 */
 	@SuppressWarnings("nls")
-	public static List<OSMWay> getMultipolygons(Document xmlDocument) {
+	public static HashMap<String, OSMWay> getMultipolygons(Document xmlDocument) {
 		
 		// Erstelle leere Liste von OSMWays
-		List<OSMWay> osmWays = new ArrayList<OSMWay>();
+		HashMap<String, OSMWay> osmWays = new HashMap<String, OSMWay>();
 
 		// Document xml = getXML(8.32, 49.001);
 		Node osmRoot = xmlDocument.getFirstChild();
-		// Zugriff auf alle Nodes mit einem "Tab" oder einer "Einrückung"
+		// Zugriff auf alle Nodes mit einem "Tab" oder einer "Einrï¿½ckung"
 		NodeList osmXMLNodes = osmRoot.getChildNodes();
 		
 		// Checke, ob jedes Element ...
@@ -173,7 +170,7 @@ public class OSMWrapperAPI {
 				}
 
 				if (hasBuildingTag) {
-					osmWays.add(new OSMWay(id, refNodesIDs, tags, version));
+					osmWays.put(id, new OSMWay(id, refNodesIDs, tags, version));
 				}
 			}
 
@@ -187,14 +184,14 @@ public class OSMWrapperAPI {
 	 * @return a list of openseamap nodes extracted from xml
 	 */
 	@SuppressWarnings("nls")
-	public static List<OSMNode> getNodes(Document xmlDocument) {
+	public static HashMap<String, OSMNode> getNodes(Document xmlDocument) {
 		
 		// Erstelle leere Liste von OSMNodes
-		List<OSMNode> osmNodes = new ArrayList<OSMNode>();
+		HashMap<String, OSMNode> osmNodes = new HashMap<String, OSMNode>();
 
 		// Document xml = getXML(8.32, 49.001);
 		Node osmRoot = xmlDocument.getFirstChild();
-		// Zugriff auf alle Nodes mit einem "Tab" oder einer "Einrückung"
+		// Zugriff auf alle Nodes mit einem "Tab" oder einer "Einrï¿½ckung"
 		NodeList osmXMLNodes = osmRoot.getChildNodes();
 		
 		// Checke, ob jedes Element ...
@@ -223,7 +220,7 @@ public class OSMWrapperAPI {
 				Node namedItemLon = attributes.getNamedItem("lon");
 				Node namedItemVersion = attributes.getNamedItem("version");
 
-				// Vorbereitung, um eine OSMNode mit den benötigten Informationen zu erstellen
+				// Vorbereitung, um eine OSMNode mit den benï¿½tigten Informationen zu erstellen
 				String id = namedItemID.getNodeValue();
 				String latitude = namedItemLat.getNodeValue();
 				String longitude = namedItemLon.getNodeValue();
@@ -233,15 +230,14 @@ public class OSMWrapperAPI {
 				}
 				
 				// Erstelle eine OSMNode
-				osmNodes.add(new OSMNode(id, latitude, longitude, version, tags));
-				
+				osmNodes.put(id, new OSMNode(id, latitude, longitude, version, tags));
 			}
 
 		}
 		return osmNodes;
 	}
 
-	public static List<OSMNode> getOSMNodesInVicinity(double lat, double lon, double vicinityRange) throws IOException,
+	public static HashMap<String, OSMNode> getOSMNodesInVicinity(double lat, double lon, double vicinityRange) throws IOException,
 			SAXException, ParserConfigurationException { 
 		return OSMWrapperAPI.getNodes(getXML(lat, lon, vicinityRange)); // lon and lat were swapped
 	}
@@ -308,27 +304,29 @@ public class OSMWrapperAPI {
 		System.out.println("----------------------");
 	}
 	
-	private static List<OSMWay> osmNodesInVicinity;
+	private static HashMap<String, OSMNode> osmNodesInVicinity;
 	
 	private static void printNodes(double lat, double lon, double radius)
 			throws IOException, SAXException, ParserConfigurationException {
 		printNodesHeading();
 		
-		List<OSMNode> osmNodesInVicinity = getOSMNodesInVicinity(lat, lon, radius);
-		for (OSMNode osmNode : osmNodesInVicinity) {
-			System.out.println(osmNode.toString());
+		osmNodesInVicinity = getOSMNodesInVicinity(lat, lon, radius);
+		
+		for (String osmNodeID : osmNodesInVicinity.keySet()) {
+			System.out.println(osmNodesInVicinity.get(osmNodeID));
 		}
 	}
 	
-	private static List<OSMWay> osmWaysInVicinity;
+	private static HashMap<String, OSMWay> osmWaysInVicinity;
 
 	private static void printWays(double lat, double lon, double radius)
 			throws IOException, SAXException, ParserConfigurationException {
 		printWaysHeading();
 		
 		osmWaysInVicinity = OSMWrapperAPI.getMultipolygons(getXML(lat, lon, radius));
-		for (OSMWay osmWay : osmWaysInVicinity) {
-			System.out.println(osmWay.toString());
+		
+		for (String osmWayID : osmWaysInVicinity.keySet()) {
+			System.out.println(osmWaysInVicinity.get(osmWayID));
 		}
 	}
 
@@ -343,9 +341,9 @@ public class OSMWrapperAPI {
 	public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException {
 		
 		//49.01105,8.4147
-		// Gebäude links vom Architekturgebäude: 49.0118, 8.41
-		// id des Gebäude-Multipolygons: 23711721
-		// linker Punkt des Gebäudes: 256759672
+		// Gebï¿½ude links vom Architekturgebï¿½ude: 49.0118, 8.41
+		// id des Gebï¿½ude-Multipolygons: 23711721
+		// linker Punkt des Gebï¿½udes: 256759672
 		double lat = 49.0118;
 		double lon = 8.41;
 		double radius = 0.0007;
@@ -356,19 +354,74 @@ public class OSMWrapperAPI {
 		
 		printNodes(lat, lon, radius);
 		
-		// Alle Referenzen herstellen in den Ways zu den Nodes
-		for (OSMWay way: osmWaysInVicinity) {
+		int counter = 0;
+		
+		for (String OSMWayID: osmWaysInVicinity.keySet()) {
 			
-			ArrayList<OSMNode> refNodes = new ArrayList<OSMNode>();
+			OSMWay currentWay = osmWaysInVicinity.get(OSMWayID);
 			
-			for (String nodeIDString: way.getRefNodesIDs()) {
+			// Lege eine Leere Nodes-Liste an fÃ¼r die aktuell betrachtete Way ...
+			LinkedHashMap<String, OSMNode> refNodes = new LinkedHashMap<String, OSMNode>();
+
+//			// Die erste Node wiederholt sich am Ende der List.
+//			OSMNode lastAndFirstNode = null;
+			
+			ArrayList<String> refNodesIDs = currentWay.getRefNodesIDs();
+			
+			// FÃ¼r jede NodeID, suche die dazugehÃ¶rige Node und fÃ¼ge sie in die LinkedHashMap ein
+			for (String OSMNodeID: refNodesIDs) {
 				
-				OSMNode tempNode;
-				tempNode = osmNodesInVicinity.ge
+				OSMNode currentNode = osmNodesInVicinity.get(OSMNodeID);
 				
-				refNodes.add(tempNode);
+//				if (lastAndFirstNode == null) // Wenn das die erste Node ist, merke sie dir
+//					lastAndFirstNode = currentNode;
+				
+				refNodes.put(OSMNodeID, currentNode);
+				
+				counter++;
 			}
+			
+			currentWay.setRefNodes(refNodes);
+			
+			
 		}
+		
+		System.out.println("\n counter = " + counter);
+		
+		// Alle Referenzen herstellen in den Ways zu den Nodes
+		// FÃ¼r jede Way ...
+//		for (OSMWay way: osmWaysInVicinity) {
+//			
+//			// Lege eine Leere Nodes-Liste an fÃ¼r die aktuell betrachtete Way ...
+//			HashMap<String, OSMNode> refNodes = new HashMap<String, OSMNode>();
+//
+//			// Die erste Node wiederholt sich am Ende der List.
+//			OSMNode lastAndFirstNode = null;
+//			
+//			// Und fÃ¼r jede Node-ID des Ways, ...
+//			for (String nodeIDString: way.getRefNodesIDs()) {
+//				
+//				// Entferne (?) sie aus der Node-Liste
+//				OSMNode tempNode;
+//				tempNode = osmNodesInVicinity.remove(Integer.parseInt(nodeIDString));
+//				osmNodesInVicinity.
+//				
+//				if (lastAndFirstNode == null) // Wenn das die erste Node ist, merke sie dir
+//					lastAndFirstNode = tempNode;
+//
+//				
+//				refNodes.add(tempNode);
+//			}
+//			
+//			way.setRefNodes(refNodes);
+//		}
+		
+//		for (OSMWay way: osmWaysInVicinity) {
+//			for(String nodeIDString: way.getRefNodesIDs()) {
+////				OSMNode tempNode = osmNodesInVicinity.rem
+//			}
+//			
+//		}
 
 
 	}
