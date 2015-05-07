@@ -1,4 +1,4 @@
-package com.bachelor.osm;
+package ba.ih_sonification.getData;
 
 /**
  * (c) Jens K�bler
@@ -191,7 +191,7 @@ public class OSMWrapperAPI {
 
 		// Document xml = getXML(8.32, 49.001);
 		Node osmRoot = xmlDocument.getFirstChild();
-		// Zugriff auf alle Nodes mit einem "Tab" oder einer "Einr�ckung"
+		// Zugriff auf alle Nodes mit einem "Tab" oder einer "Einrückung"
 		NodeList osmXMLNodes = osmRoot.getChildNodes();
 		
 		// Checke, ob jedes Element ...
@@ -220,7 +220,7 @@ public class OSMWrapperAPI {
 				Node namedItemLon = attributes.getNamedItem("lon");
 				Node namedItemVersion = attributes.getNamedItem("version");
 
-				// Vorbereitung, um eine OSMNode mit den ben�tigten Informationen zu erstellen
+				// Vorbereitung, um eine OSMNode mit den benötigten Informationen zu erstellen
 				String id = namedItemID.getNodeValue();
 				String latitude = namedItemLat.getNodeValue();
 				String longitude = namedItemLon.getNodeValue();
@@ -341,9 +341,9 @@ public class OSMWrapperAPI {
 	public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException {
 		
 		//49.01105,8.4147
-		// Geb�ude links vom Architekturgeb�ude: 49.0118, 8.41
-		// id des Geb�ude-Multipolygons: 23711721
-		// linker Punkt des Geb�udes: 256759672
+		// Gebäude links vom Architekturgebäude: 49.0118, 8.41
+		// id des Gebäude-Multipolygons: 23711721
+		// linker Punkt des Gebäudes: 256759672
 		double lat = 49.0118;
 		double lon = 8.41;
 		double radius = 0.0007;
@@ -362,9 +362,6 @@ public class OSMWrapperAPI {
 			
 			// Lege eine Leere Nodes-Liste an für die aktuell betrachtete Way ...
 			LinkedHashMap<String, OSMNode> refNodes = new LinkedHashMap<String, OSMNode>();
-
-//			// Die erste Node wiederholt sich am Ende der List.
-//			OSMNode lastAndFirstNode = null;
 			
 			ArrayList<String> refNodesIDs = currentWay.getRefNodesIDs();
 			
@@ -372,9 +369,6 @@ public class OSMWrapperAPI {
 			for (String OSMNodeID: refNodesIDs) {
 				
 				OSMNode currentNode = osmNodesInVicinity.get(OSMNodeID);
-				
-//				if (lastAndFirstNode == null) // Wenn das die erste Node ist, merke sie dir
-//					lastAndFirstNode = currentNode;
 				
 				refNodes.put(OSMNodeID, currentNode);
 				
@@ -386,43 +380,8 @@ public class OSMWrapperAPI {
 			
 		}
 		
-		System.out.println("\n counter = " + counter);
-		
-		// Alle Referenzen herstellen in den Ways zu den Nodes
-		// Für jede Way ...
-//		for (OSMWay way: osmWaysInVicinity) {
-//			
-//			// Lege eine Leere Nodes-Liste an für die aktuell betrachtete Way ...
-//			HashMap<String, OSMNode> refNodes = new HashMap<String, OSMNode>();
-//
-//			// Die erste Node wiederholt sich am Ende der List.
-//			OSMNode lastAndFirstNode = null;
-//			
-//			// Und für jede Node-ID des Ways, ...
-//			for (String nodeIDString: way.getRefNodesIDs()) {
-//				
-//				// Entferne (?) sie aus der Node-Liste
-//				OSMNode tempNode;
-//				tempNode = osmNodesInVicinity.remove(Integer.parseInt(nodeIDString));
-//				osmNodesInVicinity.
-//				
-//				if (lastAndFirstNode == null) // Wenn das die erste Node ist, merke sie dir
-//					lastAndFirstNode = tempNode;
-//
-//				
-//				refNodes.add(tempNode);
-//			}
-//			
-//			way.setRefNodes(refNodes);
-//		}
-		
-//		for (OSMWay way: osmWaysInVicinity) {
-//			for(String nodeIDString: way.getRefNodesIDs()) {
-////				OSMNode tempNode = osmNodesInVicinity.rem
-//			}
-//			
-//		}
-
+		System.out.println("\nAnzahl Ways = " + osmWaysInVicinity.size() + ",\n"
+				+ "Anzahl Way-Nodes (Anfangsnodes doppelt) = " + counter + ", Anzahl Nodes = " + osmNodesInVicinity.size());
 
 	}
 	

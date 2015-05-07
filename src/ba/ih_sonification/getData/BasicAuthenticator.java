@@ -1,4 +1,4 @@
-package com.bachelor.osm;
+package ba.ih_sonification.getData;
 
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;

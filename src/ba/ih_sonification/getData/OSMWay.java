@@ -1,4 +1,4 @@
-package com.bachelor.osm;
+package ba.ih_sonification.getData;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -53,11 +53,5 @@ public class OSMWay {
 	public void setRefNodes(LinkedHashMap<String, OSMNode> refNodes) {
 		this.refNodes = refNodes;
 	}
-	
-//	public String toStringWith Coord() {
-//		return "OSMWay [id=" + id + ", refNodesIDs=" + refNodesIDs + ", tags="
-//				+ tags + ", version=" + version + "]";
-//	}
-	
-	
+
 }
